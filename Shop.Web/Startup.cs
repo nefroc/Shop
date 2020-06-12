@@ -30,9 +30,20 @@ namespace Shop.Web
                 cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddControllersWithViews();
+            services.AddTransient<Data.SeedDb>(); //Ciclo de vida corto, la inyeccion...
 
-            services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+            //services.AddScoped<Data.IRepository, Data.Repository>(); //La inyeccion queda permanete durante la ejecución para que sea utilizada cuando sea necesaria...
+            services.AddScoped<Data.IRepository, Data.Repository>(); //La inyeccion queda permanete durante la ejecución para que sea utilizada cuando sea necesaria...
+
+            //services.AddControllersWithViews();
+
+            services.Configure<CookiePolicyOptions>(options => {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+            });
+
+            services.AddMvc();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

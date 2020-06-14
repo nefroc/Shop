@@ -5,28 +5,26 @@
     using System.Threading.Tasks;
     using Entities;
     using Microsoft.AspNetCore.Identity;
+    using Helpers;
 
     public class SeedDb
     {
         private readonly DataContext context;
-        private readonly UserManager<User> userManager;
-
+        public IUserHelper UserHelper { get; }
         private Random random;
 
-        public SeedDb(DataContext context, UserManager<User> userManager)
+        public SeedDb(DataContext context, IUserHelper userHelper)
         {
             this.context = context;
-            this.userManager = userManager;
+            UserHelper = userHelper;
             this.random = new Random();
         }
-
-        public UserManager<User> UserManager { get; }
 
         public async Task SeedAsync()
         {
             await this.context.Database.EnsureCreatedAsync();
 
-            var user = await this.userManager.FindByEmailAsync("nrodriguez@umch.org.mx");
+            var user = await this.UserHelper.GetUserByEmailAsync("nrodriguez@umch.org.mx");
             if (user == null)
             {
                 user = new User
@@ -38,7 +36,7 @@
                     PhoneNumber = "9611699602"
                 };
 
-                var result = await this.userManager.CreateAsync(user, "123456");
+                var result = await this.UserHelper.AddUserAsync(user, "123456");
                 if (result != IdentityResult.Success)
                 {
                     throw new InvalidOperationException("Could not create the user in seeder");
